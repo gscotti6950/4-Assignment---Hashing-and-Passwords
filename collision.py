@@ -1,6 +1,5 @@
 from Crypto.Hash import SHA256
 from strgen import StringGenerator as SG
-from bitstring import BitArray
 import random
 import time
 
@@ -42,34 +41,38 @@ def hash_task_one_ab():
 def hash_task_one_c():
     col_found = False
     table = {}
-    len = 32
+    len = 16
     start = time.time()
     while not col_found:
         #random length for input string
         lth = sysrandom.randint(1, 16)
+
         #gernate a random string
         temp = SG("[\w\p]{"+str(lth)+"}").render()
+
+        #do the hashing
         sha = SHA256.new()
         sha.update(temp.encode())
         dig = (sha.hexdigest())[:13]
+
+        #convert the digest to bin and int
         bits = bin(int(dig, 16))[2:(len+2)]
         key = int(bits, 2)
+
+        #check the dictionary for collison
         if table.get(key) != None and table.get(key) != temp:
             end = time.time()
+
+            #hooray! collison found
             col_found = True
             print(table.get(key))
             print(temp)
             print(bits)
             # print(key)
             print(end - start)
+
+        #add key, string to dictionary
         else:
             table[key] = temp
 
 hash_task_one_c()
-
-# sha = SHA256.new()
-# sha.update("~0Nqk7[44\9`$y]".encode())
-# print(sha.hexdigest())
-# sha = SHA256.new()
-# sha.update("QVu)5,".encode())
-# print(sha.hexdigest())
