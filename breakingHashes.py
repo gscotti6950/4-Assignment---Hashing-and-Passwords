@@ -60,39 +60,11 @@ def parseShadow():
     #print(store[1])
     return store
     
-#This function hashes all of the unique words found by uniqueWords() an dcompares it to the hash value found in shadow.txt
-def passwordCrackerHobbit(shadow_data, words):
-
-    for i in range(len(shadow_data)):
-        start_time = time.time()
-        current = "$" + shadow_data[i]["algorithm"] + "$" + shadow_data[i]["work_factor"] + "$" + shadow_data[i]["salt"]
-        password = shadow_data[i]["hash_value"]
-
-        #iterate through all of the words
-        for word in words:
-            #checks if the hash of the current word matches the hash value from shadow.txt
-            if checkpw(word.encode("utf-8"), (current+password).encode("utf-8")):#hashed[29:] == password:
-                #hooray print password for the user
-                print(shadow_data[i]["name"] + " " + word)
-                found = True
-                end_time = time.time()
-                print("cracked in: ", (end_time - start_time))
-                break
-
-        #if the password was not found print sad statement
-        if not found:
-            passwordCrackerFull(shadow_data, i, start_time)
         
-def passwordCrackerFull(shadow_data, i):
+def passwordCrackerFull(hash_string, words):
 
-    current = "$" + shadow_data[i]["algorithm"] + "$" + shadow_data[i]["work_factor"] + "$" + shadow_data[i]["salt"]
-    password = shadow_data[i]["hash_value"]
-    print(current+password)
-    hash_string = current+password
-    codex_blocks = splitCodex((qualifiedWords(words.words())), 500)
+    codex_blocks = splitCodex(words, 500)
     print(len(codex_blocks))
-    print(shadow_data[i]["name"])
-    print("done")
 
     event = Event()
     
@@ -102,9 +74,9 @@ def passwordCrackerFull(shadow_data, i):
             futures.append(executor.submit(checkHashes, hash_string, block, event))
         for future in concurrent.futures.as_completed(futures):
             if future.result():
-                print(future.result())
                 event.set()
-    return None
+                return future.result()
+    return False
 
 def checkHashes(hash_temp, wordbank, event):
     for word in wordbank:
@@ -123,10 +95,24 @@ def splitCodex(word_bank, n):
     return list((word_bank[i*k+min(i, m):(i+1)*k+min(i+1, m)] for i in range(n)))
 
 def main():
+    hobbit = uniqueWords()
+    all_words = qualifiedWords(words.words())
     shadow_data = parseShadow()
-    # words = uniqueWords()
-    # passwordCrackerHobbit(shadow_data, words)
-    passwordCrackerFull(shadow_data, 4)
+    for i in range (len(shadow_data)):
+        current = "$" + shadow_data[i]["algorithm"] + "$" + shadow_data[i]["work_factor"] + "$" + shadow_data[i]["salt"]
+        password = shadow_data[i]["hash_value"]
+        hash_string = (current + password)
+        start = time.time()
+        found = passwordCrackerFull(hash_string, hobbit)
+        if found:
+            end = time.time()
+            total_time = str((end-start))
+            print(shadow_data[i]["name"] + found + " | " + total_time)
+        else:
+            found = passwordCrackerFull(hash_string, all_words)
+            end = time.time()
+            total_time = str((end-start))
+            print(shadow_data[i]["name"] + found + " | " + total_time)
 
 if __name__ == "__main__":
     main()
