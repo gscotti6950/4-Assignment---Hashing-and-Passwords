@@ -61,14 +61,13 @@ def parseShadow():
     return store
     
         
-def passwordCrackerFull(hash_string, words):
+def passwordCrackerFull(hash_string, words, splits, threads):
 
-    codex_blocks = splitCodex(words, 500)
-    print(len(codex_blocks))
+    codex_blocks = splitCodex(words, splits)
 
     event = Event()
     
-    with concurrent.futures.ThreadPoolExecutor(max_workers = 40) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers = threads) as executor:
         futures = []
         for block in codex_blocks:
             futures.append(executor.submit(checkHashes, hash_string, block, event))
@@ -95,24 +94,26 @@ def splitCodex(word_bank, n):
     return list((word_bank[i*k+min(i, m):(i+1)*k+min(i+1, m)] for i in range(n)))
 
 def main():
+    print("making wordbanks...")
     hobbit = uniqueWords()
     all_words = qualifiedWords(words.words())
     shadow_data = parseShadow()
+    print("starting password craking...")
     for i in range (len(shadow_data)):
         current = "$" + shadow_data[i]["algorithm"] + "$" + shadow_data[i]["work_factor"] + "$" + shadow_data[i]["salt"]
         password = shadow_data[i]["hash_value"]
         hash_string = (current + password)
         start = time.time()
-        found = passwordCrackerFull(hash_string, hobbit)
+        found = passwordCrackerFull(hash_string, hobbit, 40, 40)
         if found:
             end = time.time()
             total_time = str((end-start))
-            print(shadow_data[i]["name"] + found + " | " + total_time)
+            print(shadow_data[i]["name"] + ": " + found + " | " + total_time)
         else:
-            found = passwordCrackerFull(hash_string, all_words)
+            found = passwordCrackerFull(hash_string, all_words, 500, 40)
             end = time.time()
             total_time = str((end-start))
-            print(shadow_data[i]["name"] + found + " | " + total_time)
+            print(shadow_data[i]["name"] + ": " + found + " | " + total_time)
 
 if __name__ == "__main__":
     main()
