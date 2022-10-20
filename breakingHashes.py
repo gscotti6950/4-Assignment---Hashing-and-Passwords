@@ -61,9 +61,7 @@ def parseShadow():
     return store
     
         
-def passwordCrackerFull(hash_string, words, splits, threads):
-
-    codex_blocks = splitCodex(words, splits)
+def passwordCrackerFull(hash_string, codex_blocks, threads):
 
     event = Event()
     
@@ -97,6 +95,8 @@ def main():
     print("making wordbanks...")
     hobbit = uniqueWords()
     all_words = qualifiedWords(words.words())
+    codex_blocks_hobbit = splitCodex(hobbit, 40)
+    codex_blocks_all = splitCodex(all_words, 40)
     shadow_data = parseShadow()
     print("starting password craking...")
     for i in range (len(shadow_data)):
@@ -105,15 +105,17 @@ def main():
         hash_string = (current + password)
         start = time.time()
         found = passwordCrackerFull(hash_string, hobbit, 40, 40)
+        print("checking hobbit...")
         if found:
             end = time.time()
             total_time = str((end-start))
-            print(shadow_data[i]["name"] + ": " + found + " | " + total_time)
+            print(shadow_data[i]["name"] + " " + found + " | " + total_time)
         else:
+            print("checking all words...")
             found = passwordCrackerFull(hash_string, all_words, 500, 40)
             end = time.time()
             total_time = str((end-start))
-            print(shadow_data[i]["name"] + ": " + found + " | " + total_time)
+            print(shadow_data[i]["name"] + " " + found + " | " + total_time)
 
 if __name__ == "__main__":
     main()
