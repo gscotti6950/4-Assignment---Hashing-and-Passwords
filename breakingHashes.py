@@ -104,7 +104,7 @@ def main():
         password = shadow_data[i]["hash_value"]
         hash_string = (current + password)
         start = time.time()
-        found = passwordCrackerFull(hash_string, hobbit, 40, 40)
+        found = passwordCrackerFull(hash_string, codex_blocks_hobbit, 40)
         print("checking hobbit...")
         if found:
             end = time.time()
@@ -112,7 +112,7 @@ def main():
             print(shadow_data[i]["name"] + " " + found + " | " + total_time)
         else:
             print("checking all words...")
-            found = passwordCrackerFull(hash_string, all_words, 500, 40)
+            found = passwordCrackerFull(hash_string, codex_blocks_all, 40)
             end = time.time()
             total_time = str((end-start))
             print(shadow_data[i]["name"] + " " + found + " | " + total_time)
