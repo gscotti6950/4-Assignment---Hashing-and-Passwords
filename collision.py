@@ -13,7 +13,7 @@ def hash_task_one_ab():
     lth = sysrandom.randint(1, 16)
     #gernate a random string
     temp = SG("[\w\p]{"+str(lth)+"}").render()
-    print(temp + "\n")
+    # print(temp + "\n")
 
     #caonvert string to int
     bits0 = int(temp.encode().hex(), 16)
@@ -78,4 +78,8 @@ def hash_task_one_c():
         col_found = False
         table.clear()
 
-hash_task_one_c()
+# print()
+# for i in range(0,5):
+#     hash_task_one_ab()
+#     print()
+hash_task_one_c

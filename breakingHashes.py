@@ -5,6 +5,7 @@ import time
 import concurrent.futures
 from queue import Queue
 from threading import Event
+import random
 
 #This function finds all of the unique values in hobbit.txt
 def uniqueWords():
@@ -93,26 +94,26 @@ def splitCodex(word_bank, n):
 
 def main():
     print("making wordbanks...")
-    hobbit = uniqueWords()
-    all_words = qualifiedWords(words.words())
-    codex_blocks_hobbit = splitCodex(hobbit, 40)
-    codex_blocks_all = splitCodex(all_words, 40)
+    hobbit = uniqueWords() #3350 words
+    all_words = qualifiedWords(words.words()) #135145 words
+    codex_blocks_hobbit = splitCodex(hobbit, 670)
+    codex_blocks_all = splitCodex(all_words, 4)
     shadow_data = parseShadow()
     print("starting password craking...")
-    for i in range (len(shadow_data)):
+    for i in range (4):#(len(shadow_data)):
         current = "$" + shadow_data[i]["algorithm"] + "$" + shadow_data[i]["work_factor"] + "$" + shadow_data[i]["salt"]
         password = shadow_data[i]["hash_value"]
         hash_string = (current + password)
         start = time.time()
         print("checking hobbit...")
-        found = passwordCrackerFull(hash_string, codex_blocks_hobbit, 40)
+        found = passwordCrackerFull(hash_string, codex_blocks_hobbit, 4)
         if found:
             end = time.time()
             total_time = str((end-start))
             print(shadow_data[i]["name"] + " " + found + " | " + total_time)
         else:
             print("checking all words...")
-            found = passwordCrackerFull(hash_string, codex_blocks_all, 40)
+            found = passwordCrackerFull(hash_string, codex_blocks_all, 4)
             end = time.time()
             total_time = str((end-start))
             print(shadow_data[i]["name"] + " " + found + " | " + total_time)
