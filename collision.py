@@ -2,6 +2,7 @@ from Crypto.Hash import SHA256
 from strgen import StringGenerator as SG
 import random
 import time
+import string
 
 sysrandom = random.SystemRandom()
 
@@ -49,11 +50,11 @@ def hash_task_one_c():
             lth = sysrandom.randint(1, 16)
 
             #gernate a random string
-            temp = SG("[\w\p]{"+str(lth)+"}").render()
+            res = ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=lth))
 
             #do the hashing
             sha = SHA256.new()
-            sha.update(temp.encode())
+            sha.update(res.encode())
             dig = (sha.hexdigest())[:13]
 
             #convert the digest to bin and int
@@ -61,7 +62,7 @@ def hash_task_one_c():
             key = int(bits, 2)
 
             #check the dictionary for collison
-            if table.get(key) != None and table.get(key) != temp:
+            if table.get(key) != None and table.get(key) != res:
                 end = time.time()
 
                 #hooray! collison found
@@ -74,7 +75,7 @@ def hash_task_one_c():
 
             #add key, string to dictionary
             else:
-                table[key] = temp
+                table[key] = res
         col_found = False
         table.clear()
 
@@ -82,4 +83,4 @@ def hash_task_one_c():
 # for i in range(0,5):
 #     hash_task_one_ab()
 #     print()
-hash_task_one_c
+hash_task_one_c()
